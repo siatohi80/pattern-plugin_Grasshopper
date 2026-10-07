@@ -52,6 +52,8 @@ figcaption{font-size:.88rem;color:var(--muted);padding:8px 12px;background:var(-
 table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--surface)}
 th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
 th{background:var(--accent-soft)}
+td.comp{white-space:nowrap}
+td.comp img{vertical-align:-6px;margin-right:8px}
 .note{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 14px;border-radius:6px;margin:16px 0}
 .done{color:var(--accent);font-weight:600}
 ol li,ul li{margin:.3em 0}
@@ -89,16 +91,16 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
   <p>Almost every Grasshopper pattern is the same recipe: a grid of cells, one shape per cell, and a few numbers per cell such as size, rotation or depth. An attractor is a way to compute those numbers from distance. This plugin turns that recipe into a few reusable parts: a <b>field</b> that any pattern can read, <b>fabrication limits</b> that every pattern respects, and the <b>patterns</b> themselves. Everything is on the <b>Patterns</b> tab.</p>
   <div class="tablewrap"><table>
     <tr><th>Panel</th><th>Component</th><th>What it does</th></tr>
-    <tr><td rowspan="6">Fields</td><td>Point Attractor</td><td>Field from points: 1 at the nearest point, 0 at the radius</td></tr>
-    <tr><td>Curve Attractor</td><td>Field from curves, with the curve direction, position along it and side</td></tr>
-    <tr><td>Combine Fields</td><td>Max, Sum, Blend, Subtract (repeller), Min or Multiply several fields</td></tr>
-    <tr><td>Modify Field</td><td>Remap, reshape, add noise, invert or rescale a field</td></tr>
-    <tr><td>Evaluate Field</td><td>Read a field at any points, to drive native Grasshopper geometry</td></tr>
-    <tr><td>Field Preview</td><td>Colour a surface or mesh by the field, blue for 0 and red for 1</td></tr>
-    <tr><td rowspan="2">Fabrication</td><td>Fabrication Limits</td><td>Process presets with every limit you can override</td></tr>
-    <tr><td>Fab Check</td><td>Tests any set of cutouts: bridges, hole size, margin, keep-outs and open area</td></tr>
-    <tr><td>Cells</td><td>Cell Grid</td><td>Square, hex, triangle and diamond cells inside a boundary</td></tr>
-    <tr><td>Perforation</td><td>Round Perforation</td><td>Round holes sized by a field and clamped to the limits</td></tr>
+    <tr><td rowspan="6">Fields</td><td class="comp"><img src="img/icons/PointAttractor.png" alt="" width="24" height="24">Point Attractor</td><td>Field from points: 1 at the nearest point, 0 at the radius</td></tr>
+    <tr><td class="comp"><img src="img/icons/CurveAttractor.png" alt="" width="24" height="24">Curve Attractor</td><td>Field from curves, with the curve direction, position along it and side</td></tr>
+    <tr><td class="comp"><img src="img/icons/CombineFields.png" alt="" width="24" height="24">Combine Fields</td><td>Max, Sum, Blend, Subtract (repeller), Min or Multiply several fields</td></tr>
+    <tr><td class="comp"><img src="img/icons/ModifyField.png" alt="" width="24" height="24">Modify Field</td><td>Remap, reshape, add noise, invert or rescale a field</td></tr>
+    <tr><td class="comp"><img src="img/icons/EvaluateField.png" alt="" width="24" height="24">Evaluate Field</td><td>Read a field at any points, to drive native Grasshopper geometry</td></tr>
+    <tr><td class="comp"><img src="img/icons/FieldPreview.png" alt="" width="24" height="24">Field Preview</td><td>Colour a surface or mesh by the field, blue for 0 and red for 1</td></tr>
+    <tr><td rowspan="2">Fabrication</td><td class="comp"><img src="img/icons/FabricationLimits.png" alt="" width="24" height="24">Fabrication Limits</td><td>Process presets with every limit you can override</td></tr>
+    <tr><td class="comp"><img src="img/icons/FabCheck.png" alt="" width="24" height="24">Fab Check</td><td>Tests any set of cutouts: bridges, hole size, margin, keep-outs and open area</td></tr>
+    <tr><td>Cells</td><td class="comp"><img src="img/icons/CellGrid.png" alt="" width="24" height="24">Cell Grid</td><td>Square, hex, triangle and diamond cells inside a boundary</td></tr>
+    <tr><td>Perforation</td><td class="comp"><img src="img/icons/RoundPerforation.png" alt="" width="24" height="24">Round Perforation</td><td>Round holes sized by a field and clamped to the limits</td></tr>
   </table></div>
   <p>The usual chain is <b>Point or Curve Attractor → Round Perforation</b>, with <b>Fabrication Limits</b> plugged into the pattern. Any field input also takes a plain number, and any limits input takes a number, which it reads as the material thickness.</p>
 </section>
