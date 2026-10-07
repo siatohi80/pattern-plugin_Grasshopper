@@ -43,6 +43,7 @@ nav.toc a:hover{background:var(--accent-soft);color:var(--text)}
 main section{padding:36px 0 8px;border-bottom:1px solid var(--line)}
 main section:last-child{border-bottom:0}
 h2{font-size:1.5rem;margin:0 0 .5em}
+h3{font-size:1.15rem;margin:1.4em 0 .3em}
 .step{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   color:var(--accent);margin-bottom:4px}
 figure{margin:20px 0;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -80,7 +81,7 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <a href="#overview">Overview</a><a href="#install">1 Install</a><a href="#first">2 First panel</a>
     <a href="#attractors">3 Attractors</a><a href="#falloff">4 Falloff</a><a href="#combine">5 Repellers</a>
     <a href="#modify">6 Noise and on/off</a><a href="#limits">7 Limits</a><a href="#check">8 Fab Check</a>
-    <a href="#keepouts">9 Keep-outs</a><a href="#own">10 Your own patterns</a><a href="#roadmap">Roadmap</a><a href="#help">Troubleshooting</a>
+    <a href="#keepouts">9 Keep-outs</a><a href="#grilles">10 Grilles</a><a href="#own">11 Your own patterns</a><a href="#roadmap">Roadmap</a><a href="#help">Troubleshooting</a>
   </div>
 </nav>
 
@@ -101,6 +102,10 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <tr><td class="comp"><img src="img/icons/FabCheck.png" alt="" width="24" height="24">Fab Check</td><td>Tests any set of cutouts: bridges, hole size, margin, keep-outs and open area</td></tr>
     <tr><td>Cells</td><td class="comp"><img src="img/icons/CellGrid.png" alt="" width="24" height="24">Cell Grid</td><td>Square, hex, triangle and diamond cells inside a boundary</td></tr>
     <tr><td>Perforation</td><td class="comp"><img src="img/icons/RoundPerforation.png" alt="" width="24" height="24">Round Perforation</td><td>Round holes sized by a field and clamped to the limits</td></tr>
+    <tr><td rowspan="4">Grilles</td><td class="comp"><img src="img/icons/Honeycomb.png" alt="" width="24" height="24">Honeycomb</td><td>Hexagonal openings with a field-driven wall</td></tr>
+    <tr><td class="comp"><img src="img/icons/DiamondMesh.png" alt="" width="24" height="24">Diamond Mesh</td><td>Diamond openings like expanded metal, with an aspect ratio</td></tr>
+    <tr><td class="comp"><img src="img/icons/Slats.png" alt="" width="24" height="24">Slats</td><td>Rows of slots or louvers whose width and direction follow the field</td></tr>
+    <tr><td class="comp"><img src="img/icons/Voronoi.png" alt="" width="24" height="24">Voronoi</td><td>Organic cells, denser where the field is high</td></tr>
   </table></div>
   <p>The usual chain is <b>Point or Curve Attractor → Round Perforation</b>, with <b>Fabrication Limits</b> plugged into the pattern. Any field input also takes a plain number, and any limits input takes a number, which it reads as the material thickness.</p>
 </section>
@@ -113,7 +118,7 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <li>Close Rhino.</li>
     <li>Copy <code>PatternPlugin.gha</code> to the Grasshopper Libraries folder. In Grasshopper this is <i>File › Special Folders › Components Folder</i>. On Windows it is <code>%APPDATA%\Grasshopper\Libraries\</code>.</li>
     <li>On Windows, right-click the file, choose <i>Properties</i>, and tick <b>Unblock</b> if it shows.</li>
-    <li>Start Rhino and run <code>Grasshopper</code>. You should see a <b>Patterns</b> tab with four panels.</li>
+    <li>Start Rhino and run <code>Grasshopper</code>. You should see a <b>Patterns</b> tab with five panels.</li>
   </ol>
 </section>
 
@@ -250,8 +255,29 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
   <p>For a soft solid zone instead of a hard edge, use a repeller in Combine Fields (step 5).</p>
 </section>
 
-<section id="own">
+<section id="grilles">
   <span class="step">Step 10</span>
+  <h2>Grilles: honeycomb, diamond mesh, slats and Voronoi</h2>
+  <p>The four components on the <b>Grilles</b> panel cut polygon openings instead of round holes. They take the same <b>Boundary</b>, <b>Field</b>, <b>Limits</b> and <b>Keep-outs</b> as Round Perforation, and give the same <b>Dropped</b> and <b>Report</b> outputs, so you can swap one for another in a definition.</p>
+  <figure><img src="img/grilles.svg" alt="Four panels: hexagons, diamonds, slots and Voronoi cells, each larger or denser near an orange attractor point"><figcaption>The same point attractor (orange) driving each grille. Every panel passes Fab Check with the laser preset.</figcaption></figure>
+  <div class="tablewrap"><table>
+    <tr><th>Component</th><th>The field drives</th><th>How the limits are kept</th></tr>
+    <tr><td>Honeycomb</td><td>Wall thickness, from <b>Wall</b> at field 0 to field 1</td><td>Walls never go under Min Bridge. Corners are filleted to at least Min Corner Radius. Cells near the edge shrink to keep the margin.</td></tr>
+    <tr><td>Diamond Mesh</td><td>Strand width, the same way. <b>Aspect</b> stretches the diamonds.</td><td>The same as Honeycomb</td></tr>
+    <tr><td>Slats</td><td>Slot width, from <b>Width</b> at field 0 to field 1, and the slot direction with <b>Follow</b></td><td>Width stays under Spacing − Min Bridge. Slots are never longer than Max Unsupported Length. Tabs between slots are at least Min Bridge.</td></tr>
+    <tr><td>Voronoi</td><td>Seed spacing (denser where the field is high) and wall thickness</td><td>Walls never go under Min Bridge. Cells too small to cut are dropped.</td></tr>
+  </table></div>
+  <h3>Slats that follow a curve</h3>
+  <p>Connect a <b>Curve Attractor</b> and raise <b>Follow</b>. At 0 the rows keep their <b>Angle</b>; at 1 every slot turns along the nearest stretch of the curve. Slots that would come too close to a neighbour after turning are shortened, so the result still passes Fab Check. Keep the curve gentle for the cleanest result.</p>
+  <figure><img src="img/slats-follow.svg" alt="Two slotted panels: on the left the slots are horizontal, on the right they turn along a wavy curve"><figcaption>The same curve and slots with Follow at 0 and at 1.</figcaption></figure>
+  <h3>Voronoi spacing and Relax</h3>
+  <p><b>Spacing</b> sets the seed spacing at field 0 and field 1. <b>Relax</b> evens the cells out; 2 is a good start. <b>Seed</b> gives another random layout, and <b>Points</b> lets you place the seeds yourself. <b>Cells</b> and <b>Seeds</b> are output too, if you want the raw diagram.</p>
+  <figure><img src="img/voronoi.svg" alt="Two Voronoi panels with small cells along a diagonal line; the right one has more even cells"><figcaption>A curve attractor along the diagonal makes the cells denser. Relax 0 on the left, 4 on the right.</figcaption></figure>
+  <p class="note">Wall and Width are intervals: the first number is used where the field is 0 and the second where it is 1. Swap them to make the attractor close the pattern up instead of opening it.</p>
+</section>
+
+<section id="own">
+  <span class="step">Step 11</span>
   <h2>Drive your own patterns</h2>
   <p>The fields work with any Grasshopper definition, not only this plugin's patterns.</p>
   <ol>
@@ -266,11 +292,11 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
 
 <section id="roadmap">
   <h2>Roadmap</h2>
-  <p>Version 0.1 has the field system, the fabrication tools and the first pattern. The other 13 families from the <a href="https://siatohi80.github.io/attractor-patterns-site/">browser playground</a> are coming in this order:</p>
+  <p>The plugin has the field system, the fabrication tools and the first five patterns. The other 9 families from the <a href="https://siatohi80.github.io/attractor-patterns-site/">browser playground</a> are coming in this order:</p>
   <div class="tablewrap"><table>
     <tr><th>Release</th><th>Families</th></tr>
     <tr><td>0.1</td><td><span class="done">Round perforation</span></td></tr>
-    <tr><td>Grille set</td><td>Honeycomb, Diamond mesh, Slats and louvers, Voronoi</td></tr>
+    <tr><td>Grille set</td><td><span class="done">Honeycomb, Diamond mesh, Slats and louvers, Voronoi</span></td></tr>
     <tr><td>Grid and packing set</td><td>Shape morph, Triangulated panels, Circle packing, Halftone</td></tr>
     <tr><td>Tiling and line set</td><td>Jewel studs, Islamic and girih, Truchet, Flow and contour lines</td></tr>
     <tr><td>Simulation</td><td>Reaction-diffusion</td></tr>
@@ -288,6 +314,9 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <tr><td>Many holes dropped</td><td>Raise the low end of Diameter, or pick a preset with a smaller Min Feature</td></tr>
     <tr><td>Big holes all the same size</td><td>They are clamped by Min Bridge. Raise Pitch to let them grow.</td></tr>
     <tr><td>Open area warning</td><td>Lower the Diameter range or raise Pitch, or override Max Open Area</td></tr>
+    <tr><td>Grille cells with no opening</td><td>The wall is as wide as the cell. Lower Wall or raise Pitch.</td></tr>
+    <tr><td>Slats much shorter than Length</td><td>They are capped at Max Unsupported Length, or shortened to clear a turned neighbour. Lower Follow or raise Spacing.</td></tr>
+    <tr><td>"Spacing would make more than 100,000 cells"</td><td>Raise the small end of Voronoi Spacing</td></tr>
     <tr><td>Solve is slow</td><td>Raise Pitch, or use fewer, simpler attractor curves</td></tr>
   </table></div>
 </section>
