@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern Plugin for Grasshopper</title>
+<meta name="description" content="A Grasshopper plugin for Rhino that makes attractor-driven perforations, textures and cutouts, clamped to real manufacturing limits. Tutorial and download.">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#f3f4f5; --surface:#ffffff; --text:#1b1f24; --muted:#5b636d; --line:#d5d9de;
+  --accent:#c4561a; --accent-soft:#f6e7dc; --code:#e9ecef;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171a; --surface:#1c2024; --text:#e7eaed; --muted:#9aa3ad; --line:#30363d;
+    --accent:#f08a45; --accent-soft:#2c221b; --code:#262b31;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--accent)}
+code{background:var(--code);padding:.1em .35em;border-radius:4px;font-size:.92em}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header.hero{border-bottom:1px solid var(--line);background:var(--surface)}
+.hero .wrap{padding-top:40px;padding-bottom:32px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.95rem}
+.brand img{width:32px;height:32px}
+h1{font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.15;margin:.4em 0 .3em}
+.lead{font-size:1.1rem;color:var(--muted);max-width:640px;margin:0}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn{display:inline-block;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;
+  border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.secondary{color:var(--accent)}
+.hero figure{margin-top:28px}
+nav.toc{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.toc .wrap{display:flex;gap:4px;overflow-x:auto;padding-top:8px;padding-bottom:8px;scrollbar-width:none}
+nav.toc a{white-space:nowrap;text-decoration:none;color:var(--muted);font-size:.9rem;padding:4px 10px;border-radius:999px}
+nav.toc a:hover{background:var(--accent-soft);color:var(--text)}
+main section{padding:36px 0 8px;border-bottom:1px solid var(--line)}
+main section:last-child{border-bottom:0}
+h2{font-size:1.5rem;margin:0 0 .5em}
+.step{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:4px}
+figure{margin:20px 0;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+figure img{display:block;width:100%;height:auto}
+figcaption{font-size:.88rem;color:var(--muted);padding:8px 12px;background:var(--surface);border-top:1px solid var(--line)}
+.tablewrap{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--surface)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft)}
+.note{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 14px;border-radius:6px;margin:16px 0}
+.done{color:var(--accent);font-weight:600}
+ol li,ul li{margin:.3em 0}
+footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><img src="img/icon.svg" alt="">Grasshopper plugin for Rhino 7 and 8</div>
+    <h1>Pattern Plugin</h1>
+    <p class="lead">Perforations, textures and parametric cutouts driven by point and line attractors, and clamped to real manufacturing limits so every result can be cut.</p>
+    <div class="buttons">
+      <a class="btn primary" href="downloads/PatternPlugin.gha" download>Download the plugin (.gha)</a>
+      <a class="btn secondary" href="https://siatohi80.github.io/attractor-patterns-site/">Try the patterns in your browser</a>
+    </div>
+    <figure><img src="img/banner.svg" alt="A grille-shaped panel with round holes that grow along a wavy curve"><figcaption>A grille panel. A curve attractor (dashed) drives the hole size, and every hole respects the bridge and margin limits.</figcaption></figure>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Tutorial steps">
+  <div class="wrap">
+    <a href="#overview">Overview</a><a href="#install">1 Install</a><a href="#first">2 First panel</a>
+    <a href="#attractors">3 Attractors</a><a href="#falloff">4 Falloff</a><a href="#combine">5 Repellers</a>
+    <a href="#modify">6 Noise and on/off</a><a href="#limits">7 Limits</a><a href="#check">8 Fab Check</a>
+    <a href="#keepouts">9 Keep-outs</a><a href="#own">10 Your own patterns</a><a href="#roadmap">Roadmap</a><a href="#help">Troubleshooting</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section id="overview">
+  <h2>Overview</h2>
+  <p>Almost every Grasshopper pattern is the same recipe: a grid of cells, one shape per cell, and a few numbers per cell such as size, rotation or depth. An attractor is a way to compute those numbers from distance. This plugin turns that recipe into a few reusable parts: a <b>field</b> that any pattern can read, <b>fabrication limits</b> that every pattern respects, and the <b>patterns</b> themselves. Everything is on the <b>Patterns</b> tab.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Panel</th><th>Component</th><th>What it does</th></tr>
+    <tr><td rowspan="6">Fields</td><td>Point Attractor</td><td>Field from points: 1 at the nearest point, 0 at the radius</td></tr>
+    <tr><td>Curve Attractor</td><td>Field from curves, with the curve direction, position along it and side</td></tr>
+    <tr><td>Combine Fields</td><td>Max, Sum, Blend, Subtract (repeller), Min or Multiply several fields</td></tr>
+    <tr><td>Modify Field</td><td>Remap, reshape, add noise, invert or rescale a field</td></tr>
+    <tr><td>Evaluate Field</td><td>Read a field at any points, to drive native Grasshopper geometry</td></tr>
+    <tr><td>Field Preview</td><td>Colour a surface or mesh by the field, blue for 0 and red for 1</td></tr>
+    <tr><td rowspan="2">Fabrication</td><td>Fabrication Limits</td><td>Process presets with every limit you can override</td></tr>
+    <tr><td>Fab Check</td><td>Tests any set of cutouts: bridges, hole size, margin, keep-outs and open area</td></tr>
+    <tr><td>Cells</td><td>Cell Grid</td><td>Square, hex, triangle and diamond cells inside a boundary</td></tr>
+    <tr><td>Perforation</td><td>Round Perforation</td><td>Round holes sized by a field and clamped to the limits</td></tr>
+  </table></div>
+  <p>The usual chain is <b>Point or Curve Attractor → Round Perforation</b>, with <b>Fabrication Limits</b> plugged into the pattern. Any field input also takes a plain number, and any limits input takes a number, which it reads as the material thickness.</p>
+</section>
+
+<section id="install">
+  <span class="step">Step 1</span>
+  <h2>Install</h2>
+  <p>The plugin is built for Rhino 7 and Rhino 8.</p>
+  <ol>
+    <li>Close Rhino.</li>
+    <li>Copy <code>PatternPlugin.gha</code> to the Grasshopper Libraries folder. In Grasshopper this is <i>File › Special Folders › Components Folder</i>. On Windows it is <code>%APPDATA%\Grasshopper\Libraries\</code>.</li>
+    <li>On Windows, right-click the file, choose <i>Properties</i>, and tick <b>Unblock</b> if it shows.</li>
+    <li>Start Rhino and run <code>Grasshopper</code>. You should see a <b>Patterns</b> tab with four panels.</li>
+  </ol>
+</section>
+
+<section id="first">
+  <span class="step">Step 2</span>
+  <h2>Your first perforated panel</h2>
+  <ol>
+    <li>Draw a closed planar curve in Rhino, such as a rectangle 200 × 100, and reference it in a <b>Curve</b> parameter.</li>
+    <li>Drop <b>Round Perforation</b> and connect the curve to <b>Boundary</b>. With nothing else connected you get full-size holes on a hex grid, clamped to the default limits (1.5 mm sheet).</li>
+    <li>Add a <b>Point</b> parameter, set a point inside the panel, and connect it to <b>Point Attractor → Points</b>. Connect <b>Point Attractor → Field</b> to <b>Round Perforation → Field</b>.</li>
+    <li>Read <b>Report</b> in a Panel. It says how many holes were placed, how many were clamped to the limits and how many were dropped as too small, and the open area.</li>
+  </ol>
+  <div class="tablewrap"><table>
+    <tr><th>Input</th><th>Default</th><th>What it changes</th></tr>
+    <tr><td>Grid</td><td>Hex</td><td>Square or hex layout. Right-click to pick by name.</td></tr>
+    <tr><td>Pitch</td><td>10</td><td>Centre-to-centre spacing</td></tr>
+    <tr><td>Rotation</td><td>0</td><td>Grid angle in degrees</td></tr>
+    <tr><td>Diameter</td><td>2 to 8</td><td>Hole size at field value 0 and at field value 1</td></tr>
+    <tr><td>Threshold</td><td>0</td><td>No hole where the field is below this value (step 6)</td></tr>
+    <tr><td>Keep-outs</td><td>empty</td><td>Closed curves the holes stay clear of (step 9)</td></tr>
+  </table></div>
+  <p><b>Holes</b> are circles ready to bake and cut. <b>Dropped</b> shows the cells where a hole would have been smaller than the minimum feature size.</p>
+</section>
+
+<section id="attractors">
+  <span class="step">Step 3</span>
+  <h2>Point and curve attractors</h2>
+  <p>Both attractors output a <b>Field</b>. Its value is 1 at the attractor and falls to 0 at <b>Radius</b>. With several points or curves, the closest one wins. <b>Strength</b> multiplies the value.</p>
+  <figure><img src="img/point-vs-curve.svg" alt="Two panels: holes grow around two points, and holes grow along a zig-zag curve"><figcaption>Left: two attractor points. Right: one curve attractor.</figcaption></figure>
+  <p>A curve attractor knows more than distance. <b>Evaluate Field</b> returns it all for any points:</p>
+  <ul>
+    <li><b>Direction</b>: the curve's tangent, for rotating slats or cells along it. For points it points away from the nearest point.</li>
+    <li><b>Position</b>: 0 at the start of the curve and 1 at the end, for patterns that change along the curve.</li>
+    <li><b>Side</b>: 1 on the left of the curve and −1 on the right, looking along it with <b>Normal</b> pointing up.</li>
+  </ul>
+  <p>Set the curve attractor's <b>Side</b> input to <i>Left only</i> or <i>Right only</i> so the pattern opens on one side of a character line and stays closed on the other.</p>
+  <figure><img src="img/side.svg" alt="Holes only above a diagonal line"><figcaption>Curve Attractor with Side set to Left only.</figcaption></figure>
+</section>
+
+<section id="falloff">
+  <span class="step">Step 4</span>
+  <h2>Falloff: how the effect fades</h2>
+  <p><b>Falloff</b> sets the shape of the fade from the attractor to the radius. Right-click it to pick by name. Every preset reaches exactly 0 at the radius, so nothing leaks past it.</p>
+  <figure><img src="img/falloffs.svg" alt="Five panels showing linear, smoothstep, gaussian, inverse square and stepped falloffs"><figcaption>The same point attractor with each falloff.</figcaption></figure>
+  <div class="tablewrap"><table>
+    <tr><th>Falloff</th><th>Looks like</th></tr>
+    <tr><td>Linear</td><td>An even gradient</td></tr>
+    <tr><td>Smoothstep</td><td>Soft at both ends. The default.</td></tr>
+    <tr><td>Gaussian</td><td>A tight core with a long soft tail</td></tr>
+    <tr><td>Inverse square</td><td>A sharp spike at the attractor</td></tr>
+    <tr><td>Stepped</td><td>Rings of equal size. <b>Bands</b> sets how many.</td></tr>
+  </table></div>
+  <p>Turn on <b>Invert</b> to make the effect strong far from the attractor. For your own fade, draw a curve that goes from top-left to bottom-right and connect it to <b>Profile</b>. It is read in its bounding box: x is distance from 0 to 1 and y is strength from 0 to 1. This works like Grasshopper's Graph Mapper.</p>
+</section>
+
+<section id="combine">
+  <span class="step">Step 5</span>
+  <h2>Several attractors and repellers</h2>
+  <p><b>Combine Fields</b> takes a list of fields. Pick the <b>Mode</b> by name.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Mode</th><th>Use it for</th></tr>
+    <tr><td>Max</td><td>Several attractors, the strongest wins</td></tr>
+    <tr><td>Sum</td><td>Effects that add up where attractors overlap</td></tr>
+    <tr><td>Blend</td><td>A weighted average, set with <b>Weights</b></td></tr>
+    <tr><td>Subtract</td><td>A repeller: every field after the first pushes the effect away</td></tr>
+    <tr><td>Min, Multiply</td><td>Masks: one field limits where the other can act</td></tr>
+  </table></div>
+  <figure><img src="img/combine.svg" alt="Holes grow toward a point but stop in a ring around it"><figcaption>A large attractor minus a small repeller at the same point leaves a solid patch in the middle.</figcaption></figure>
+  <p>Directions follow whichever field is strongest at each point, so rotating patterns turn toward the dominant attractor.</p>
+</section>
+
+<section id="modify">
+  <span class="step">Step 6</span>
+  <h2>Noise, remapping and on/off</h2>
+  <p><b>Modify Field</b> changes a field before a pattern reads it. The steps run top to bottom:</p>
+  <ul>
+    <li><b>Input</b>: the range mapped to 0..1. Use 0.2 to 0.8 to make the gradient steeper.</li>
+    <li><b>Reshape</b>: a profile curve, like Falloff's Profile</li>
+    <li><b>Gamma</b>: above 1 tightens the effect around the attractor, below 1 widens it</li>
+    <li><b>Noise</b>, <b>Noise Scale</b> and <b>Seed</b>: smooth random variation that is the same every time for the same seed</li>
+    <li><b>Invert</b>, <b>Output</b> range and <b>Clamp</b></li>
+  </ul>
+  <p>To switch holes on and off rather than resize them, set the Diameter to a single size (for example 4 to 4) and raise <b>Threshold</b> on Round Perforation. Cells where the field is below it get no hole.</p>
+  <figure><img src="img/threshold.svg" alt="Two irregular islands of equal holes"><figcaption>Two point attractors plus noise, Threshold 0.4, one hole size.</figcaption></figure>
+</section>
+
+<section id="limits">
+  <span class="step">Step 7</span>
+  <h2>Fabrication limits</h2>
+  <p>An attractor will happily push a hole to nothing or merge two holes into one. <b>Fabrication Limits</b> stops that. Plug it into a pattern's <b>Limits</b> input, and every hole is clamped in this order:</p>
+  <ol>
+    <li>Take the diameter from the field and the Diameter range.</li>
+    <li>Shrink it so the bridge to every neighbour is at least <b>Min Bridge</b>.</li>
+    <li>Shrink it to keep <b>Edge Margin</b> from the boundary and Min Bridge from any keep-out.</li>
+    <li>If it is now under <b>Min Feature</b>, drop the hole instead of shrinking it further.</li>
+  </ol>
+  <figure><img src="img/limits.svg" alt="Left: overlapping red holes in the centre and tiny red holes at the edge. Right: the same pattern clamped, with crosses where holes were dropped"><figcaption>Left: the raw field. Red holes break a limit. Right: the same field with Fabrication Limits. Crosses mark dropped holes.</figcaption></figure>
+  <p>Pick a <b>Preset</b> and set <b>Thickness</b>. The other values follow from it, and any input you connect overrides just that value. <b>Summary</b> lists the values in use.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Preset</th><th>Thickness means</th><th>Min bridge</th><th>Min feature</th></tr>
+    <tr><td>Laser sheet</td><td>Sheet thickness t</td><td>1 × t</td><td>0.5 × t (at least 0.5)</td></tr>
+    <tr><td>Punched sheet</td><td>Sheet thickness t</td><td>1 × t</td><td>1 × t</td></tr>
+    <tr><td>Waterjet</td><td>Sheet thickness t</td><td>1.5 × t (at least 1.5)</td><td>1.5 × t (at least 1.5)</td></tr>
+    <tr><td>CNC relief</td><td>Tool diameter</td><td>0.5 × t (at least 1)</td><td>1 × t</td></tr>
+    <tr><td>Injection molding</td><td>Wall thickness</td><td>1 × t (at least 1)</td><td>1 × t (at least 1)</td></tr>
+    <tr><td>FDM print</td><td>Nozzle diameter</td><td>2 × t</td><td>2 × t</td></tr>
+    <tr><td>SLA print</td><td>Smallest feature</td><td>1 × t (at least 0.3)</td><td>1 × t (at least 0.3)</td></tr>
+  </table></div>
+  <div class="note">The presets are rules of thumb, in millimetres. Check them against your fabricator's specs before you cut.</div>
+</section>
+
+<section id="check">
+  <span class="step">Step 8</span>
+  <h2>Check any cutout pattern</h2>
+  <p><b>Fab Check</b> works on any closed curves, including patterns you built by hand or with other plugins. Connect the cutouts to <b>Openings</b>, the panel outline to <b>Boundary</b> and your limits to <b>Limits</b>.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Output</th><th>What it gives</th></tr>
+    <tr><td>Pass</td><td>True when nothing fails</td></tr>
+    <tr><td>Report</td><td>One line with the counts and the worst values</td></tr>
+    <tr><td>Min Bridge, Smallest Feature</td><td>The worst values found</td></tr>
+    <tr><td>Open Area</td><td>Open area in percent, the number airflow, acoustic and daylight targets use</td></tr>
+    <tr><td>Failing</td><td>The cutouts that break a limit, for a red preview</td></tr>
+    <tr><td>Issues</td><td>What is wrong with each cutout</td></tr>
+    <tr><td>Markers</td><td>Points at the middle of every bridge that is too thin</td></tr>
+  </table></div>
+  <p>Feature size is the hydraulic diameter (4 × area ÷ perimeter). It is the diameter for a circle and the side for a square, so slots and polygons are judged fairly.</p>
+</section>
+
+<section id="keepouts">
+  <span class="step">Step 9</span>
+  <h2>Keep-outs for mounting holes and logos</h2>
+  <p>Connect closed curves to <b>Keep-outs</b>. Holes inside them are dropped, and holes next to them shrink to keep Min Bridge clear.</p>
+  <figure><img src="img/keepouts.svg" alt="A perforated panel with four mounting holes and a central rectangle kept solid"><figcaption>Four mounting holes and a logo area kept solid.</figcaption></figure>
+  <p>For a soft solid zone instead of a hard edge, use a repeller in Combine Fields (step 5).</p>
+</section>
+
+<section id="own">
+  <span class="step">Step 10</span>
+  <h2>Drive your own patterns</h2>
+  <p>The fields work with any Grasshopper definition, not only this plugin's patterns.</p>
+  <ol>
+    <li><b>Cell Grid</b> gives square, hex, triangle or diamond cells inside a boundary, with their centres. Connect a field to get each centre's value.</li>
+    <li><b>Evaluate Field</b> gives the value, direction, position and side at any points.</li>
+    <li>Remap the values into your own range and drive anything: scale, rotation, extrusion depth or a morph.</li>
+    <li>Run the result through <b>Fab Check</b> before you cut it.</li>
+  </ol>
+  <figure><img src="img/grids.svg" alt="Square, hex, triangle and diamond cell grids"><figcaption>The four Cell Grid tilings. Dots are the cell centres.</figcaption></figure>
+  <p><b>Field Preview</b> colours a surface or mesh by any field, so you can tune the attractors before running a heavy pattern.</p>
+</section>
+
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <p>Version 0.1 has the field system, the fabrication tools and the first pattern. The other 13 families from the <a href="https://siatohi80.github.io/attractor-patterns-site/">browser playground</a> are coming in this order:</p>
+  <div class="tablewrap"><table>
+    <tr><th>Release</th><th>Families</th></tr>
+    <tr><td>0.1</td><td><span class="done">Round perforation</span></td></tr>
+    <tr><td>Grille set</td><td>Honeycomb, Diamond mesh, Slats and louvers, Voronoi</td></tr>
+    <tr><td>Grid and packing set</td><td>Shape morph, Triangulated panels, Circle packing, Halftone</td></tr>
+    <tr><td>Tiling and line set</td><td>Jewel studs, Islamic and girih, Truchet, Flow and contour lines</td></tr>
+    <tr><td>Simulation</td><td>Reaction-diffusion</td></tr>
+  </table></div>
+  <p>Patterns work on flat, closed boundaries for now. Curved surfaces come with the 3D families.</p>
+</section>
+
+<section id="help">
+  <h2>Troubleshooting</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Problem</th><th>Fix</th></tr>
+    <tr><td>No Patterns tab</td><td>Check the .gha is in the Components folder and unblocked, then restart Rhino</td></tr>
+    <tr><td>"Boundary must be planar"</td><td>Use a flat closed curve. Project a curve onto a plane first if needed.</td></tr>
+    <tr><td>"Pitch leaves no room for a hole"</td><td>Pitch must be at least Min Bridge + Min Feature. Raise Pitch or lower the limits.</td></tr>
+    <tr><td>Many holes dropped</td><td>Raise the low end of Diameter, or pick a preset with a smaller Min Feature</td></tr>
+    <tr><td>Big holes all the same size</td><td>They are clamped by Min Bridge. Raise Pitch to let them grow.</td></tr>
+    <tr><td>Open area warning</td><td>Lower the Diameter range or raise Pitch, or override Max Open Area</td></tr>
+    <tr><td>Solve is slow</td><td>Raise Pitch, or use fewer, simpler attractor curves</td></tr>
+  </table></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Try every pattern family in your browser in the <a href="https://siatohi80.github.io/attractor-patterns-site/">Attractor Patterns playground</a>.</p>
+    <p>© 2026 Siavash Tohidi.</p>
+  </div>
+</footer>
+
+</body>
+</html>
