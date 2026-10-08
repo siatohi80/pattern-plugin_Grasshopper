@@ -81,7 +81,7 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <a href="#overview">Overview</a><a href="#install">1 Install</a><a href="#first">2 First panel</a>
     <a href="#attractors">3 Attractors</a><a href="#falloff">4 Falloff</a><a href="#combine">5 Repellers</a>
     <a href="#modify">6 Noise and on/off</a><a href="#limits">7 Limits</a><a href="#check">8 Fab Check</a>
-    <a href="#keepouts">9 Keep-outs</a><a href="#grilles">10 Grilles</a><a href="#own">11 Your own patterns</a><a href="#roadmap">Roadmap</a><a href="#help">Troubleshooting</a>
+    <a href="#keepouts">9 Keep-outs</a><a href="#grilles">10 Grilles</a><a href="#more">11 Tilings and slots</a><a href="#own">12 Your own patterns</a><a href="#roadmap">Roadmap</a><a href="#help">Troubleshooting</a>
   </div>
 </nav>
 
@@ -101,11 +101,18 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <tr><td rowspan="2">Fabrication</td><td class="comp"><img src="img/icons/FabricationLimits.png" alt="" width="24" height="24">Fabrication Limits</td><td>Process presets with every limit you can override</td></tr>
     <tr><td class="comp"><img src="img/icons/FabCheck.png" alt="" width="24" height="24">Fab Check</td><td>Tests any set of cutouts: bridges, hole size, margin, keep-outs and open area</td></tr>
     <tr><td>Cells</td><td class="comp"><img src="img/icons/CellGrid.png" alt="" width="24" height="24">Cell Grid</td><td>Square, hex, triangle and diamond cells inside a boundary</td></tr>
-    <tr><td>Perforation</td><td class="comp"><img src="img/icons/RoundPerforation.png" alt="" width="24" height="24">Round Perforation</td><td>Round holes sized by a field and clamped to the limits</td></tr>
+    <tr><td rowspan="2">Perforation</td><td class="comp"><img src="img/icons/RoundPerforation.png" alt="" width="24" height="24">Round Perforation</td><td>Round holes sized by a field and clamped to the limits</td></tr>
+    <tr><td class="comp"><img src="img/icons/Sunflower.png" alt="" width="24" height="24">Sunflower</td><td>Round holes on a golden-angle (Fibonacci) spiral</td></tr>
     <tr><td rowspan="4">Grilles</td><td class="comp"><img src="img/icons/Honeycomb.png" alt="" width="24" height="24">Honeycomb</td><td>Hexagonal openings with a field-driven wall</td></tr>
     <tr><td class="comp"><img src="img/icons/DiamondMesh.png" alt="" width="24" height="24">Diamond Mesh</td><td>Diamond openings like expanded metal, with an aspect ratio</td></tr>
     <tr><td class="comp"><img src="img/icons/Slats.png" alt="" width="24" height="24">Slats</td><td>Rows of slots or louvers whose width and direction follow the field</td></tr>
     <tr><td class="comp"><img src="img/icons/Voronoi.png" alt="" width="24" height="24">Voronoi</td><td>Organic cells, denser where the field is high</td></tr>
+    <tr><td rowspan="3">Tilings</td><td class="comp"><img src="img/icons/StrutLattice.png" alt="" width="24" height="24">Strut Lattice</td><td>Triangle openings between struts that swell into round nodes</td></tr>
+    <tr><td class="comp"><img src="img/icons/YTiles.png" alt="" width="24" height="24">Y Tiles</td><td>Three-armed Y shapes that grow and thicken near the attractor</td></tr>
+    <tr><td class="comp"><img src="img/icons/NestedHexagons.png" alt="" width="24" height="24">Nested Hexagons</td><td>Segmented hexagon rings, with a second ring near the attractor</td></tr>
+    <tr><td rowspan="3">Slots</td><td class="comp"><img src="img/icons/Herringbone.png" alt="" width="24" height="24">Herringbone</td><td>Slot rows leaning alternately left and right</td></tr>
+    <tr><td class="comp"><img src="img/icons/PinwheelLens.png" alt="" width="24" height="24">Pinwheel Lens</td><td>Lens slits on a triangle grid that twist into pinwheels</td></tr>
+    <tr><td class="comp"><img src="img/icons/CrossSlot.png" alt="" width="24" height="24">Cross-slot Diamonds</td><td>±45° slots that grow into diamond outlines</td></tr>
   </table></div>
   <p>The usual chain is <b>Point or Curve Attractor → Round Perforation</b>, with <b>Fabrication Limits</b> plugged into the pattern. Any field input also takes a plain number, and any limits input takes a number, which it reads as the material thickness.</p>
 </section>
@@ -118,7 +125,7 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
     <li>Close Rhino.</li>
     <li>Copy <code>PatternPlugin.gha</code> to the Grasshopper Libraries folder. In Grasshopper this is <i>File › Special Folders › Components Folder</i>. On Windows it is <code>%APPDATA%\Grasshopper\Libraries\</code>.</li>
     <li>On Windows, right-click the file, choose <i>Properties</i>, and tick <b>Unblock</b> if it shows.</li>
-    <li>Start Rhino and run <code>Grasshopper</code>. You should see a <b>Patterns</b> tab with five panels.</li>
+    <li>Start Rhino and run <code>Grasshopper</code>. You should see a <b>Patterns</b> tab with seven panels.</li>
   </ol>
 </section>
 
@@ -276,8 +283,26 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
   <p class="note">Wall and Width are intervals: the first number is used where the field is 0 and the second where it is 1. Swap them to make the attractor close the pattern up instead of opening it.</p>
 </section>
 
-<section id="own">
+<section id="more">
   <span class="step">Step 11</span>
+  <h2>Tilings, slots and the sunflower</h2>
+  <p>Seven more families from the <a href="https://siatohi80.github.io/attractor-patterns-site/">browser playground</a>. They sit on the <b>Tilings</b> and <b>Slots</b> panels, with <b>Sunflower</b> on Perforation, and they take the same Boundary, Field, Limits and Keep-outs inputs as every other pattern.</p>
+  <figure><img src="img/new-families.svg" alt="Seven panels: strut lattice, Y tiles, nested hexagons, sunflower dots, herringbone slots, pinwheel lens slits and cross-slot diamonds, each driven by an orange attractor point"><figcaption>The same point attractor (orange) driving each family with its default settings. Every panel passes Fab Check with the laser preset.</figcaption></figure>
+  <div class="tablewrap"><table>
+    <tr><th>Component</th><th>The field drives</th><th>How the limits are kept</th></tr>
+    <tr><td>Strut Lattice</td><td><b>Strut</b> width and the <b>Corner</b> radius. Thin struts and crisp triangles near the attractor, swollen round nodes far away.</td><td>Struts never go under Min Bridge.</td></tr>
+    <tr><td>Y Tiles</td><td><b>Arm</b> length and <b>Width</b></td><td>Arms are capped so the tips keep Min Bridge to the next row. Inner corners are filleted.</td></tr>
+    <tr><td>Nested Hexagons</td><td><b>Ring width</b>. A second ring appears where there is room (<b>Inner ring</b>).</td><td>Each ring is six segments with a full bridge at every corner, so the centre never falls out.</td></tr>
+    <tr><td>Sunflower</td><td>Dot <b>Diameter</b> along the spiral. <b>Center</b> moves the spiral; empty uses the middle of the boundary.</td><td>Diameter is capped by the spiral <b>Spacing</b> so neighbours keep Min Bridge.</td></tr>
+    <tr><td>Herringbone</td><td>Slot <b>Length</b> and <b>Width</b>. <b>Lean</b> sets the angle of the alternating rows.</td><td>Length is capped so the chevron ends of neighbouring rows keep Min Bridge.</td></tr>
+    <tr><td>Pinwheel Lens</td><td>Slit <b>Length</b>, <b>Width</b> and <b>Twist</b></td><td>Lens tips are rounded to Min Corner Radius. Twisted slits shrink to clear their neighbours.</td></tr>
+    <tr><td>Cross-slot Diamonds</td><td>Slot <b>Length</b>, until the slots meet as diamond outlines</td><td>Length is capped to keep a bridge where four slots meet.</td></tr>
+  </table></div>
+  <p>Shapes that stand on their own (Y tiles, slits, slots and dots) are placed strongest field first. A later shape that would come too close to one already placed is shortened, and dropped if it would end up under Min Feature. So the strong areas look the way you set them, and the result always passes Fab Check.</p>
+</section>
+
+<section id="own">
+  <span class="step">Step 12</span>
   <h2>Drive your own patterns</h2>
   <p>The fields work with any Grasshopper definition, not only this plugin's patterns.</p>
   <ol>
@@ -292,11 +317,12 @@ footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem}
 
 <section id="roadmap">
   <h2>Roadmap</h2>
-  <p>The plugin has the field system, the fabrication tools and the first five patterns. The other 9 families from the <a href="https://siatohi80.github.io/attractor-patterns-site/">browser playground</a> are coming in this order:</p>
+  <p>The plugin has the field system, the fabrication tools and 12 patterns. The remaining families from the <a href="https://siatohi80.github.io/attractor-patterns-site/">browser playground</a> are coming in this order:</p>
   <div class="tablewrap"><table>
     <tr><th>Release</th><th>Families</th></tr>
     <tr><td>0.1</td><td><span class="done">Round perforation</span></td></tr>
     <tr><td>Grille set</td><td><span class="done">Honeycomb, Diamond mesh, Slats and louvers, Voronoi</span></td></tr>
+    <tr><td>Playground additions</td><td><span class="done">Strut lattice, Y tiles, Nested hexagons, Sunflower, Herringbone, Pinwheel lens, Cross-slot diamonds</span></td></tr>
     <tr><td>Grid and packing set</td><td>Shape morph, Triangulated panels, Circle packing, Halftone</td></tr>
     <tr><td>Tiling and line set</td><td>Jewel studs, Islamic and girih, Truchet, Flow and contour lines</td></tr>
     <tr><td>Simulation</td><td>Reaction-diffusion</td></tr>
